@@ -71,36 +71,40 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
 
 
 app.get('/register_commands', async (req,res) =>{
-  let slash_commands = [
-    {
-        "name": "생성",
-        "description": "지갑 만드는 명령언데 내가 착하니까 천원씩은 넣어줌 ㅋ",
-        "options": []
-    },
-  ]
-
-  for (let file of fs.readdirSync('./commands')) {
-    let pull = require(`./commands/${file}`);
-    slash_commands.push({
-        "name": file,
-        "description": pull.description,
-        "options": pull.options
-    })
-  }
-  try
-  {
-    // api docs - https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
-    let discord_response = await discord_api.put(
-      `/applications/${APPLICATION_ID}/guilds/${GUILD_ID}/commands`,
-      slash_commands
-    )
-    console.log(discord_response.data)
-    return res.send('commands have been registered')
-  }catch(e){
-    console.error(e.code)
-    console.error(e.response?.data)
-    return res.send(`${e.code} error from discord`)
-  }
+    try {
+        let slash_commands = [
+            {
+                "name": "생성",
+                "description": "지갑 만드는 명령언데 내가 착하니까 천원씩은 넣어줌 ㅋ",
+                "options": []
+            },
+          ]
+        
+          for (let file of fs.readdirSync('./commands')) {
+            let pull = require(`./commands/${file}`);
+            slash_commands.push({
+                "name": file,
+                "description": pull.description,
+                "options": pull.options
+            })
+          }
+          try
+          {
+            // api docs - https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
+            let discord_response = await discord_api.put(
+              `/applications/${APPLICATION_ID}/guilds/${GUILD_ID}/commands`,
+              slash_commands
+            )
+            console.log(discord_response.data)
+            return res.send('commands have been registered')
+          }catch(e){
+            console.error(e.code)
+            console.error(e.response?.data)
+            return res.send(`${e.code} error from discord`)
+          }
+    } catch (e) {
+        console.log(e)
+    }
 })
 
 
